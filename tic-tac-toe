@@ -1,0 +1,158 @@
+a=['1','2','3','4','5','6','7','8','9']
+
+
+
+player1_ = []
+player2_ = []
+
+
+w=[a[0:3],a[3:6],a[6:9],[a[0],a[4],a[8]],
+   [a[2],a[4],a[6]] , [a[2],a[5],a[8]] , [a[1],a[4],a[7]]
+   , [a[0],a[3],a[6]]]
+
+
+
+
+
+
+
+
+def change_show(x,y,p):
+    global w
+    global a
+    if (x==0):
+        if ((y in player1_) or (y in player2_)):
+            print('num is already selected')
+
+        else:
+            a[y-1]=p
+            if(p=='x'):
+                player1_.append(y)
+            elif(p=='o'):
+                player2_.append(y)
+
+            w = [a[0:3], a[3:6], a[6:9], [a[0], a[4], a[8]],
+                 [a[2], a[4], a[6]], [a[2], a[5], a[8]], [a[1], a[4], a[7]]
+                , [a[0], a[3], a[6]]]
+            return 0;
+
+    else:
+        for i in range(0,a.__len__()):
+            if(x==(i+1)):
+                a[i] = str(x)
+
+        for i in range(0,a.__len__()):
+            if(y==(i+1)):
+                a[i] = p
+
+    if (p == 'x'):
+        player1_.remove(x)
+        player1_.append(y)
+    elif (p == 'o'):
+        player2_.remove(x)
+        player2_.append(y)
+
+    w = [a[0:3], a[3:6], a[6:9], [a[0], a[4], a[8]],
+         [a[2], a[4], a[6]], [a[2], a[5], a[8]], [a[1], a[4], a[7]]
+        , [a[0], a[3], a[6]]]
+
+def show():
+    print('========')
+    print(w[0])
+    print(w[1])
+    print(w[2])
+
+
+def player1(x,y):
+    p='x'
+
+    if((x in player2_) or (y in player2_) or (y in player1_)
+            or (x not in player1_ and x != 0) ):
+
+
+        print('select another num please player 1')
+        return 0;
+
+
+    elif (player1_.__len__() == 3 and x == 0):
+        print('select another num please player 1')
+        return 0
+    else:
+        change_show(x, y, p)
+        return 1
+
+
+def player2(x,y):
+    p='o'
+    if((x in player1_) or (y in player1_) or (y in player2_) or
+            (x not in player2_ and x!=0) ):
+
+
+        print('select another num please player 2')
+        return 0
+    elif(player2_.__len__() == 3 and x == 0):
+        print('select another num please player 2')
+        return 0
+    else:
+        change_show(x,y,p)
+        return 1
+
+def clear():
+    global a
+    global w
+    a = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+
+    player1_.clear()
+    player2_.clear()
+
+    w = [a[0:3], a[3:6], a[6:9], [a[0], a[2], a[8]],
+         [a[2], a[4], a[6]], [a[2], a[5], a[8]], [a[1], a[4], a[7]]
+        , [a[0], a[3], a[6]]]
+def main():
+    print('hello to sega game')
+    p1=0
+    p2=0
+    r = 1
+    while 1:
+
+        for i in w:
+            if (i.count('x') == 3):
+                print('player 1 is won')
+                p1 = p1+1
+                print('p1 : '+str(p1))
+                print('p2 : '+str(p2))
+                clear()
+            elif (i.count('o') == 3):
+                print('player 2 is won')
+                p2 =p2+1
+                print('p1 : ' + str(p1))
+                print('p2 : ' + str(p2))
+                clear()
+
+        show()
+        if((r%2) == 0):
+            print('player 2')
+            
+
+            while 1:
+                x = int(input('inter first (0 for begin) : '))
+                y = int(input('inter second  : '))
+                if(player2(x,y) == 0):
+                    pass
+                else:
+                    break
+        elif ((r%2) != 0):
+            print('player 1')
+            
+            while 1:
+                x = int(input('inter first (0 for begin) : '))
+                y = int(input('inter second  : '))
+                if (player1(x, y) == 0):
+                    pass
+                else:
+                    break
+        r = r+1
+
+
+
+main()
