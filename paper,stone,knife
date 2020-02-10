@@ -1,0 +1,70 @@
+import random
+
+player =0
+com =0
+
+def game():
+    global player
+    global com
+
+
+    if player ==3 or com ==3:
+        if player == 3:
+            print('game finished and player won')
+        elif com == 3:
+            print('game finished and computer won')
+        player = 0
+        com = 0
+
+
+        print('1:exit , 2:regame')
+        l=input('inter here ')
+        if l=='1':
+            exit()
+        else:
+            game()
+
+
+    print('')
+    print('===============')
+    print('inter your game : [1:stone , 2:paper , 3:knife]')
+
+
+    while (1):
+        try:
+            m = input('inter here : ')
+            m = int(m)
+            break
+        except ValueError:
+            print('inter int value')
+
+
+    w=['stone','paper','knife']
+    x=random.choice(w)
+    if (m==1 and x=='stone') or (m ==2 and x=='paper') or (m==3 and x=='knife'):
+        print(x)
+        print('draw')
+        print('')
+        print('player : '+str(player))
+        print('computer : ' + str(com))
+        game()
+
+    elif (m==1 and x=='paper') or (m ==2 and x=='knife') or (m==3 and x=='stone'):
+        print(x)
+        print('you lose')
+        com = com+1
+        print('')
+        print('player : ' + str(player))
+        print('computer : ' + str(com))
+        game()
+    elif (m==1 and x=='knife') or (m ==2 and x=='stone') or (m==3 and x=='paper'):
+        print(x)
+        print('you win')
+        player = player+1
+        print('')
+        print('player : ' + str(player))
+        print('computer : ' + str(com))
+        game()
+
+
+game()
