@@ -1,0 +1,64 @@
+import cv2
+import numpy as np
+
+
+#read the image
+img= cv2.imread(r"C:\Users\iP\Desktop\po\seg.jpg")
+
+# resize image ====>  size * 4
+resized = cv2.resize(img, (img.shape[1]*4,img.shape[0]*4), interpolation = cv2.INTER_LINEAR)
+
+# convert image from BGR to GRAY
+gray = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY ) 
+
+# threshold image to remove noise and small objects
+ret,thresh = cv2.threshold(gray,100,255,cv2.THRESH_BINARY_INV)
+
+#find contours to catch digits
+cont, hierarchy = cv2.findContours(thresh, cv2.RETR_LIST , cv2.CHAIN_APPROX_SIMPLE)
+
+# images of digits
+digits = []
+
+
+
+# loop throwt all contours
+u=0
+for cnt in cont:
+    #get bounding rectangle around to contour (digit)
+    x,y,w,h = cv2.boundingRect(cnt)
+    
+    # if contour hight bigger than 100 = do something 
+    if h >100:
+        # add a copy of the thresholding image
+        digits.append(thresh)
+        
+        # mask 
+        mask = np.zeros(thresh.shape[:2], dtype=np.uint8)
+        
+        # fill the digit on mask
+        cv2.fillPoly(mask, pts =[cnt], color=(255))
+        
+        # ectract only the digit from the thresh image 
+        digits[-1] = cv2.bitwise_and(digits[-1],digits[-1],mask = mask)
+        
+        
+        # change the image to focus only on the digit
+        digits[-1] = digits[-1][y:y+h,x:x+w]
+        
+        # show the image of digit
+        cv2.imshow("digit"+str(u),digits[-1])
+        
+        #increase u to show image for every digit
+        u = u+1
+        
+        
+     
+   
+
+        
+
+#show the image 
+cv2.imshow("image",resized)
+
+cv2.waitKey(0)
