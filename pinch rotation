@@ -1,0 +1,64 @@
+import numpy as np
+import cv2
+import math
+
+
+img = cv2.imread(r'C:\Users\iP\Desktop\55.jpg')
+img = cv2.resize(img,None,None,2,2)
+res = np.zeros((img.shape[0],img.shape[1],3),np.uint8)
+
+radius =200 # radius of filter
+angel=-90 * math.pi/180 # angel
+
+centerx=(float((img.shape[1]-1))/2)
+centery=(float((img.shape[0]-1))/2)
+
+
+for x in range(0,img.shape[1]):
+    for y in range(0,img.shape[0]):
+        
+        
+        px = x - centerx
+        py = y - centery
+        
+        dis = math.sqrt(math.pow(px,2)+math.pow(py,2))
+        newx=0
+        newy=0
+        if dis >radius or dis ==0:
+            newx=x
+            newy=y
+        else:
+           
+            
+            dis = dis / radius
+            e= 1-dis
+            a= angel*e
+        
+          
+            px = px *math.cos(a)- py*math.sin(a)
+            py = px *math.sin(a)+ py*math.cos(a)
+            newx = centerx + px
+            newy = centery + py
+            
+            
+            
+            
+        if newx <0:
+            newx=0
+        elif newx >img.shape[1]-1:
+            newx = img.shape[1]-1
+        elif newy <0:
+            newy = 0
+        elif newy >img.shape[0]-1:
+            newy = img.shape[0]-1
+            
+        res[y,x] = img[int(newy),int(newx)]
+            
+        
+        
+
+
+cv2.imshow('img',img)
+cv2.imshow('res',res)
+
+cv2.waitKey(0)
