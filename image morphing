@@ -21,7 +21,7 @@ img = cv2.imread(r"C:\Users\iP\Desktop\po\abo1.jpg")
 
 img2 = cv2.imread(r"C:\Users\iP\Desktop\po\mosa.jpg")
 
-#right , left eyes and mouse 
+#lift , right eyes and mouse 
 pts1 = np.array([[218, 240],[295, 240],[250, 383]],np.float32)
 
 
