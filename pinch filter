@@ -1,0 +1,78 @@
+import numpy as np
+import cv2
+import math
+
+
+img = cv2.imread(r'C:\Users\iP\Desktop\po\inna4.jpg')
+res = np.zeros((img.shape[0],img.shape[1],3),np.uint8)
+
+radius =50
+amount=-0.5
+
+centerx=(float((img.shape[1]-1))/2)
+centery=(float((img.shape[0]-1))/2)
+
+
+facex = 381
+facey = 102
+for x in range(0,img.shape[1]):
+    for y in range(0,img.shape[0]):
+        
+        
+        px = x - facex
+        py = y - facey
+        
+        dis = math.sqrt(math.pow(px,2)+math.pow(py,2))
+        newx=0
+        newy=0
+        if dis >radius or dis ==0:
+            newx=x
+            newy=y
+        else:
+            '''
+            here we calc (distance / radius) to
+            find the distance % between the point and the center of pinch in radius
+            if the distance is near to 1 , the filter on the point is lower
+            
+            for example if the point's distance =200
+            so 200 / (radius=200)= 1
+            so   r = math.pow(dis,amount) -> 1**amount =1
+            px = px * r
+            py = py * r
+            px , py is the new coordinates of the point 
+            
+            so no change on the point 
+            
+            '''
+            dis = dis / radius
+            
+        
+            r=math.pow(dis,amount)
+          
+            px = px * r
+            py = py * r
+            newx = facex + px
+            newy = facey + py
+            
+            
+            
+            
+        if newx <0:
+            newx=0
+        elif newx >img.shape[1]-1:
+            newx = img.shape[1]-1
+        elif newy <0:
+            newy = 0
+        elif newy >img.shape[0]-1:
+            newy = img.shape[0]-1
+            
+        res[y,x] = img[int(newy),int(newx)]
+            
+        
+        
+
+
+cv2.imshow('img',img)
+cv2.imshow('res',res)
+
+cv2.waitKey(0)
