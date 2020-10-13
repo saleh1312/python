@@ -1,0 +1,170 @@
+import numpy as np
+import cv2
+
+# we make class to our objects
+class obj:
+  followed=False  # if this contour is already in video ( in previous frames )
+  shape = ''  # to detect shape
+  ide =0      # id of contour
+  passed = False  # to know if the object already passed the line
+  def __init__(self, x,y,w,h):
+    self.x = x
+    self.y = y
+    self.w = w
+    self.h = h
+  def remove(self):
+    self.x = -300
+    self.y = -300
+    self.w = -300
+    self.h = -300
+    
+    
+def CheckExitLineCrossing(y,CoorYExitLine):
+    AbsDistance=abs(y-CoorYExitLine)
+    if (AbsDistance<=20):
+        return 1
+    else:
+        return 0
+    
+    
+    
+    
+cap = cv2.VideoCapture(r'C:\Users\iP\Desktop\Video 9.wmv')
+
+objects =[]
+
+passing=0
+
+rect =0
+tri = 0
+
+ret, frame = cap.read()
+    
+height = frame.shape[0]
+width = frame.shape[1]
+
+while(cap.isOpened()):
+    
+    ret, frame = cap.read() 
+    
+    if(ret != True):
+        break
+    
+    
+   
+    OffsetRefLines = 20
+    
+    draw = np.zeros(frame.shape,dtype=np.uint8)
+    kernel = np.ones((11,11),np.uint8)
+    frame = cv2.morphologyEx(frame, cv2.MORPH_CLOSE, kernel)
+    frame = cv2.morphologyEx(frame, cv2.MORPH_OPEN, kernel)
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    
+    gray = cv2.GaussianBlur(gray,(7,7),0)
+
+    ret,thresh1 = cv2.threshold(gray,127,255,cv2.THRESH_BINARY)
+    
+    
+    
+    contours, hierarchy = cv2.findContours(thresh1, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    
+    for i in contours:
+        
+        #filter small contours or noise
+        x,y,w,h = cv2.boundingRect(i)
+        if(w < 105 and h < 105):
+            continue
+        
+        
+        #detect the corners of contour to know the shape
+        epsilon = 0.1*cv2.arcLength(i,True)
+        approx = cv2.approxPolyDP(i,epsilon,True)
+        cv2.drawContours(frame,[approx],-1,(0,255,0),2)
+        #detect the shape
+        shape =''
+        if(approx.shape[0] ==3):
+            shape ='triangle'
+        elif (approx.shape[0] == 4):
+            shape ='square'
+       
+  
+    
+    
+        #center of contour
+        cx = x + 0.5*w
+        cy = y + 0.5*h
+        frame = cv2.circle(frame, (int(cx),int(cy)), 5, (255,0,0),5)
+        
+        existed = False # to know if this contour is already exist and not new
+        
+        #loop over all object
+        for c in objects:
+            #if center pixel is in bounding rect of object
+            if(cx > c.x and cx < c.x+c.w and cy > c.y and cy < c.y+c.h):
+                #update contour with new coordinates
+                c.x = x
+                c.y = y
+                c.w = w
+                c.h = h
+                c.followed = True # this object is exist in video
+                existed = True # contour is not new 
+                c.shape = shape
+                break
+        # add new object
+        if(existed == False):
+            new_cont = obj(x, y, w, h)
+            new_cont.followed = True
+            new_cont.shape = shape
+            
+            new_cont.ide = len(objects)+1
+            objects.append(new_cont)
+            
+    #loop all objects if there are objects is no loonger exist in video we
+            #remove it 
+    for i in objects:
+        if(i.followed == False):
+            i.remove()
+    
+    
+    #print objects
+    for i in objects:
+        if(i.followed == True):
+            frame=cv2.putText(frame, str(i.ide)+' '+i.shape, (i.x,i.y), cv2.FONT_HERSHEY_SIMPLEX ,
+                              1
+                        , (255,255,255),4)
+            
+            
+        #if y inside the line and the objct didnt pass the line before
+        if(CheckExitLineCrossing(i.y , int(height/2)-OffsetRefLines) and i.passed == False):
+      
+            passing +=1
+        
+            if(i.shape =='triangle'):
+                tri +=1
+                
+            elif(i.shape =='square'):
+                rect +=1
+                
+            i.passed = True
+            
+    # all objects is set to false to next frame
+    for i in objects:
+        i.followed = False
+        
+    frame = cv2.line(frame, (0,int(height/2)-OffsetRefLines), (width-1,int(height/2)-OffsetRefLines), (0,0,255), 3)
+        
+    cv2.putText(frame, "exit: {}".format(str(passing)), (10,10),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)#pour afficher le resultat du triangle sur la video
+    cv2.putText(frame, "rectangle: {}".format(str(rect)), (100, 10),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)#pour afficher le resultat du circle sur la video
+    cv2.putText(frame, "triangle: {}".format(str(tri)), (230, 10),cv2.FONT_HERSHEY_SIMPLEX, 0.5,(255, 255, 255), 2)
+
+    cv2.imshow('frame',frame)
+    
+    if cv2.waitKey(30) & 0xFF == ord('q'):
+        break
+    
+
+print('objects passed the line = '+str(passing))
+print('recatangles the line = '+str(rect))
+print('triangles the line = '+str(tri))
+cap.release()
+cv2.destroyAllWindows()
