@@ -1,0 +1,29 @@
+DELIMITER //
+DROP PROCEDURE if EXISTS my_pro //
+CREATE PROCEDURE my_pro (OUT med int)
+BEGIN
+    DECLARE rows_count,median1n,median2n,median1,median2,median decimal DEFAULT 0;
+    DECLARE median1int , median1intvalue int;
+    CREATE TEMPORARY TABLE temp SELECT *,row_number() over(ORDER BY salary) as ran from data; 
+    SELECT COUNT(salary) INTO rows_count FROM temp;
+    IF (LEFT(rows_count, 1)%2)=0 THEN
+        SET median1n = rows_count/2;
+        SET median2n = (rows_count/2)+1;
+        SELECT salary INTO median1 FROM temp WHERE ran=median1n;
+        SELECT salary INTO median2 FROM temp WHERE ran=median2n;
+        SET median =(median1+median2)/2;
+        SET med=median;
+    ELSE
+        SET median1n = (rows_count/2);
+        SELECT cast(median1n AS signed) INTO median1int;
+        SELECT salary INTO median1intvalue FROM temp WHERE ran=median1int;
+        SET med=median1intvalue;
+ 
+    END IF;
+
+END //
+DELIMITER ;
+
+SET @yo =4;
+CALL my_pro(@yo);
+SELECT @yo;
