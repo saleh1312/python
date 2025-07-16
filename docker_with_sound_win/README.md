@@ -5,5 +5,5 @@
 docker build -t sound-demo .
 
 
-docker run -it --rm -e PULSE_SERVER=host.docker.internal sound-demo
+docker run -it --rm sound-demo
 

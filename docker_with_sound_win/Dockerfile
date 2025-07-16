@@ -1,6 +1,13 @@
 FROM ubuntu:22.04
 
-RUN apt-get update && \
-    apt-get install alsa-utils pulseaudio
 
-CMD ["aplay", "/usr/share/sounds/alsa/Front_Center.wav"]
+RUN apt update -y
+RUN apt install alsa-utils pulseaudio -y
+
+WORKDIR /home/app
+
+COPY audio.wav .
+
+ENV PULSE_SERVER=host.docker.internal
+
+CMD ["aplay", "audio.wav"]
